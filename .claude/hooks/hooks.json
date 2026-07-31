@@ -1,0 +1,39 @@
+{
+  "description": "Lightweight webnovel-writer runtime guardrails: short project status on session start and best-effort blocking for direct writes to Story System/read-model files.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -X utf8 \"${WEBNOVEL_ROOT:-$PWD}/hooks/session_start.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -X utf8 \"${WEBNOVEL_ROOT:-$PWD}/hooks/guard_runtime_write.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -X utf8 \"${WEBNOVEL_ROOT:-$PWD}/hooks/guard_runtime_write.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

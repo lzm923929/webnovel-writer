@@ -1,0 +1,7 @@
+# OpenAI Codex / ChatGPT Codex project configuration
+# Codex automatically loads `codex.md` (and `AGENTS.md`) from the project root.
+# This file is optional and documents the supported setup.
+
+model = "gpt-5-codex"   # or your preferred Codex model
+# Project instructions are read from ./codex.md (fallback ./AGENTS.md).
+# Commands live in ./skills/<name>/SKILL.md; agents in ./agents/<name>.md.

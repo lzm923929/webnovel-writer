@@ -1,0 +1,38 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -X utf8 \"${WEBNOVEL_ROOT:-$PWD}/.claude/hooks/session_start.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -X utf8 \"${WEBNOVEL_ROOT:-$PWD}/.claude/hooks/guard_runtime_write.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -X utf8 \"${WEBNOVEL_ROOT:-$PWD}/.claude/hooks/guard_runtime_write.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

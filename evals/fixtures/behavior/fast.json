@@ -1,0 +1,159 @@
+{
+  "schema_version": "webnovel-behavior-evals/v1",
+  "suite": "fast",
+  "cases": [
+    {
+      "id": "skill_frontmatter",
+      "type": "skill_frontmatter",
+      "description": "Every skill has routeable frontmatter."
+    },
+    {
+      "id": "skill_init_contract",
+      "type": "skill_contract",
+      "skill": "webnovel-init",
+      "description": "/webnovel-init keeps the deep collection gate and avoids writing canon before confirmation.",
+      "required": [
+        "未过充分性闸门，不执行 `webnovel.py init`",
+        "用户确认前不得写入",
+        "python -X utf8"
+      ]
+    },
+    {
+      "id": "skill_plan_contract",
+      "type": "skill_contract",
+      "skill": "webnovel-plan",
+      "description": "/webnovel-plan preserves outline blockers and Story System runtime contract refresh.",
+      "required": [
+        "若发现总纲与设定冲突，先阻断",
+        "placeholder-scan",
+        "story-system"
+      ]
+    },
+    {
+      "id": "skill_write_contract",
+      "type": "skill_contract",
+      "skill": "webnovel-write",
+      "description": "/webnovel-write calls runtime gates at natural boundaries.",
+      "required": [
+        "write-gate --chapter {chapter_num} --stage prewrite",
+        "write-gate --chapter {chapter_num} --stage precommit",
+        "write-gate --chapter {chapter_num} --stage postcommit",
+        "projections retry --chapter {chapter_num}"
+      ],
+      "ordered": [
+        [
+          "write-gate --chapter {chapter_num} --stage precommit",
+          "chapter-commit"
+        ],
+        [
+          "chapter-commit",
+          "write-gate --chapter {chapter_num} --stage postcommit"
+        ]
+      ]
+    },
+    {
+      "id": "skill_review_contract",
+      "type": "skill_contract",
+      "skill": "webnovel-review",
+      "description": "/webnovel-review relies on reviewer output and preserves blocking issue handling.",
+      "required": [
+        "必须通过 `Agent` 工具调用 `reviewer`",
+        "review-pipeline",
+        "blocking=true"
+      ]
+    },
+    {
+      "id": "skill_query_contract",
+      "type": "skill_contract",
+      "skill": "webnovel-query",
+      "description": "/webnovel-query stays read-only and prioritizes Story System sources.",
+      "required": [
+        "只读操作，不修改任何项目文件",
+        "memory-contract load-context",
+        "写前真源"
+      ]
+    },
+    {
+      "id": "skill_learn_contract",
+      "type": "skill_contract",
+      "skill": "webnovel-learn",
+      "description": "/webnovel-learn writes through the project-memory CLI instead of manual JSON edits.",
+      "required": [
+        "project-memory add-pattern",
+        "不删除旧记录，仅追加",
+        "禁止使用 `Write`"
+      ]
+    },
+    {
+      "id": "skill_dashboard_contract",
+      "type": "skill_contract",
+      "skill": "webnovel-dashboard",
+      "description": "/webnovel-dashboard remains read-only and exposes runtime health.",
+      "required": [
+        "只读",
+        "/api/story-runtime/health",
+        "python -m dashboard.server"
+      ]
+    },
+    {
+      "id": "skill_doctor_contract",
+      "type": "skill_contract",
+      "skill": "webnovel-doctor",
+      "description": "/webnovel-doctor stays read-only and uses project-status before detailed checks.",
+      "required": [
+        "只读诊断",
+        "project-status",
+        "doctor --format text"
+      ]
+    },
+    {
+      "id": "write_blocks_before_commit",
+      "type": "write_blocking_gate",
+      "description": "/webnovel-write keeps blocking review issues before commit and calls runtime gates."
+    },
+    {
+      "id": "data_agent_artifact_only",
+      "type": "data_agent_boundary",
+      "description": "data-agent produces commit artifacts and does not directly write projection read-models."
+    },
+    {
+      "id": "artifact_ownership",
+      "type": "artifact_ownership",
+      "description": "reviewer returns JSON while main flow writes review_results.json; data-agent writes only tmp artifacts."
+    },
+    {
+      "id": "commit_drives_projection",
+      "type": "commit_projection_runtime",
+      "description": "ChapterCommitService remains the projection driver."
+    },
+    {
+      "id": "dashboard_read_only",
+      "type": "dashboard_read_only",
+      "description": "Dashboard exposes GET-only API semantics."
+    },
+    {
+      "id": "user_report_minimal_review_skipped",
+      "type": "user_report_probe",
+      "scenario": "minimal_review_skipped",
+      "description": "/webnovel-write --minimal final report explains skipped reviewer instead of pretending full review passed."
+    },
+    {
+      "id": "user_report_missing_data_artifacts",
+      "type": "user_report_probe",
+      "scenario": "missing_data_artifacts",
+      "description": "Missing data-agent artifacts prevent a completed write report."
+    },
+    {
+      "id": "user_report_projection_retry_auto_handled",
+      "type": "user_report_probe",
+      "scenario": "projection_retry_auto_handled",
+      "description": "Projection retry success is reported as auto-handled."
+    },
+    {
+      "id": "user_report_review_blocking_must_handle",
+      "type": "user_report_probe",
+      "scenario": "review_blocking_must_handle",
+      "description": "Reviewer blocking issues are reported as must-handle."
+    }
+  ]
+}
