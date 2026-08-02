@@ -51,7 +51,7 @@ argument-hint: "[书名或灵感（可选）]"
 export WORKSPACE_ROOT="${WEBNOVEL_WORKSPACE:-$PWD}"
 
 if [ -z "${WEBNOVEL_ROOT:-$PWD}" ] || [ ! -d "${WEBNOVEL_ROOT:-$PWD}/scripts" ]; then
-  echo "ERROR: 未设置 CLAUDE_PLUGIN_ROOT 或缺少目录: ${WEBNOVEL_ROOT:-$PWD}/scripts" >&2
+  echo "ERROR: 未设置 WEBNOVEL_ROOT 或缺少目录: ${WEBNOVEL_ROOT:-$PWD}/scripts" >&2
   exit 1
 fi
 export SCRIPTS_DIR="${WEBNOVEL_ROOT:-$PWD}/scripts"

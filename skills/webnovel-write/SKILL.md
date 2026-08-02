@@ -13,11 +13,15 @@ argument-hint: "[章号] [--fast|--minimal]"
 
 ## 模式
 
-| 模式 | 流程 |
-|------|------|
-| 默认 | Step 1→2→3→4→5→6 |
-| `--fast` | Step 1→2→3(轻量)→4→5→6 |
-| `--minimal` | Step 1→2→3(写 no-review artifact)→4(仅排版)→5→6 |
+| 模式 | 流程 | 审查范围 | 适用章节类型（约束） |
+|------|------|----------|----------------------|
+| 默认 full | Step 1→2→3→4→5→6 | 5 维全查 | 正文章、关键节点章、卷首/卷尾章 |
+| `--fast` | Step 1→2→3(轻量)→4→5→6 | 仅 `setting`/`timeline`/`continuity` 3 维 | 过渡章、低风险日常章 |
+| `--minimal` | Step 1→2→3(写 no-review artifact)→4(仅排版)→5→6 | 跳过 reviewer | **仅限**草稿章、非正史番外、或用户明确选择 |
+
+> 约束：`--minimal` 不得用于正史主线关键章；滥用跳过审查视为违反铁律第 3 条。
+> 审查只跑一轮（reviewer 只调用一次）；blocking 定点修复后按 Step 3 的 targeted 复检要求处理，不整体重跑 reviewer。
+> 审查标准（维度/严重度/闸门/KPI）以 `references/review-schema.md` 为权威实现。
 
 ## 硬规则
 
@@ -160,6 +164,8 @@ python -X utf8 "${SCRIPTS_DIR}/webnovel.py" --project-root "${PROJECT_ROOT}" rev
 ```
 
 审查只跑一轮，reviewer 只调用一次。`blocking=true` 的问题在不改剧情、不破设定的前提下定点修复后直接进 Step 4，不重新调用 reviewer；确实无法修复的 blocking 问题用 `AskUserQuestion` 让用户裁决（接受当前版本 / 手动修复 / 放弃）。非 blocking issue 交给 Step 4 处理。`--fast` 只检查 setting/timeline/continuity。
+
+**🔴 定点修复后的 targeted 复检（v1.1 新增，防修复盲区）**：blocking 在本回被定点修复后，必须对**修改段落**做一次 targeted 复检（只查修改段落及其直接上下文，确认未引入新的 critical/high issue），或显式在最终报告标注"已定点修复，修改段未经复检"。复检要求与输出格式见 `agents/reviewer.md` §10；确实无法在本回闭环的 blocking 必须交用户裁决，不得默认放行。
 
 `--minimal` 不调用 reviewer 与 `review-pipeline`，但必须**覆盖写入**本章新的 no-review `review_results.json`（禁止复用旧 artifact），使 Step 5 提交链有有效 `--review-result`（成功标准“审查已落库”对 `--minimal` 的豁免仍成立）：
 
@@ -324,7 +330,7 @@ python -X utf8 "${SCRIPTS_DIR}/webnovel.py" --project-root "${PROJECT_ROOT}" use
 
 1. 正文文件存在且非空
 2. 审查已落库（`--minimal` 除外）
-3. blocking=true 必须在 Step 3 定点修复或经用户裁决
+3. blocking=true 已在 Step 3 定点修复（修改段经 targeted 复检或显式标注未复检）或经用户裁决
 4. anti_ai_force_check=pass（`--minimal` 除外）
 5. accepted CHAPTER_COMMIT，projection 五项 done/skipped
 6. chapter_status=committed（projection 自动推进）

@@ -111,12 +111,20 @@ python "${SCRIPTS_DIR}/webnovel.py" --project-root "${PROJECT_ROOT}" update-stat
 
 兼容投影 / read model，不是写后事实真源。
 
-### Step 8：处理阻断
+### Step 8：处理阻断（升级与裁决协议 v1.1）
 
-存在任意 `blocking=true` 问题时，用 `AskUserQuestion` 让用户裁决：
+按以下分级路由处理，不得一律二元裁决：
 
-- 立即修复：输出返工清单，仅在用户明确授权下做最小修改。
-- 仅保存报告，稍后处理：保留报告与指标记录，结束流程。
+| 情形 | 路由 | 用户裁决选项 |
+|------|------|--------------|
+| 存在 `blocking=true` | 立即升级（不可静默），用 `AskUserQuestion` 裁决 | 立即修复（输出返工清单，仅在用户明确授权下做最小修改）/ 仅保存报告稍后处理（保留报告与指标记录，结束流程）/ 放弃本次审查 |
+| reviewer `failed` / `partial` / 正文空 / 维度跳过 / 耗时异常 | 标记 `needs_user_action=true` | 重跑审查 / 人工介入 / 放弃 |
+| 非 blocking 高收益建议 | 列为"建议确认"，**不阻断** | （无需裁决，作者自行采纳） |
+| 无阻断 | 不询问，直接放行并提示可继续写下一章 | — |
+
+> 裁决影响须向用户说明（如"立即修复"会做最小修改，"仅存报告"保留记录结束流程）。
+> 裁决参考 `references/review/blocking-override-guidelines.md`：涉及设定/时间线/事实/连续性断裂的 critical issue **禁止建议 override**。
+> 卡住时必须说明卡点、已完成内容与恢复建议（如"reviewer 结果已保存，metrics 落库失败；重跑 `/webnovel-review` 会从落库继续"）。
 
 ## 成功标准
 
